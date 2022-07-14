@@ -6,6 +6,8 @@ import com.ciandt.feedfront.excecoes.ComprimentoInvalidoException;
 import com.ciandt.feedfront.excecoes.EmailInvalidoException;
 import com.ciandt.feedfront.excecoes.EmployeeNaoEncontradoException;
 
+import java.io.IOException;
+
 /**
  * Hello world!
  *
@@ -32,6 +34,8 @@ public class App
             System.out.println("Criacao de Employee feito com sucesso!");
         } catch (EmailInvalidoException | ArquivoException ex) {
             System.out.println(ex.getMessage());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         System.out.println("-------------------------------");
         System.out.println("Lista de Employees:");
