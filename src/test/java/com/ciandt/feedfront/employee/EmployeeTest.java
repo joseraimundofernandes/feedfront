@@ -6,6 +6,7 @@ import com.ciandt.feedfront.excecoes.ComprimentoInvalidoException;
 import com.ciandt.feedfront.excecoes.EmailInvalidoException;
 import com.ciandt.feedfront.excecoes.EmployeeNaoEncontradoException;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,45 +28,46 @@ public class EmployeeTest {
         employee2 = null;
     }
     @Test
+    @Order(1)
     public void salvarEmployeeTest() throws ComprimentoInvalidoException, EmailInvalidoException, IOException, EmployeeNaoEncontradoException {
         employee2 = new Employee("João", "Silveira", "j.silveira@email.com");
 
         Employee.salvarEmployee(employee1);
 
-//        Exception emailException = assertThrows(EmailInvalidoException.class, () -> {
-//           Employee.salvarEmployee(employee2);
-//        });
-//
-//        String mensagemEsperada = "E-mail ja cadastrado no repositorio";
-//        String mensagemRecebida = emailException.getMessage();
-//
-//        assertEquals(mensagemEsperada, mensagemRecebida);
+        Exception emailException = assertThrows(EmailInvalidoException.class, () -> {
+           Employee.salvarEmployee(employee2);
+        });
+
+        String mensagemEsperada = "E-mail ja cadastrado no repositorio";
+        String mensagemRecebida = emailException.getMessage();
+
+        assertEquals(mensagemEsperada, mensagemRecebida);
     }
 
     @Test
+    @Order(2)
     public void listarEmployees() throws ArquivoException {
         List<Employee> employees = Employee.listarEmployees();
-
+        System.out.println(employees);
         assertTrue(employees.isEmpty() == false);
         assertTrue(employees.size() == 1);
     }
 
     @Test
+    @Order(3)
     public void buscarEmployee() throws ArquivoException, EmployeeNaoEncontradoException{
-        System.out.println(employee1.getId());
         Employee retornoDePesquisa = Employee.buscarEmployee(employee1.getId());
-        //Employee retornoDePesquisa = Employee.buscarEmployee("cdcee83f-9473-4411-aad2-1813d1c719f1");
 
         assertEquals(employee1.getId(), retornoDePesquisa.getId());
 
-//        Exception employeeNaoEncontradoException = assertThrows(EmployeeNaoEncontradoException.class, () -> {
-//                Employee.buscarEmployee(UUID.randomUUID().toString());
-//        });
-//        System.out.println(employeeNaoEncontradoException.getMessage());
-//        assertEquals(employeeNaoEncontradoException.getMessage(), "Employee não encontrado");
+        Exception employeeNaoEncontradoException = assertThrows(EmployeeNaoEncontradoException.class, () -> {
+                Employee.buscarEmployee(UUID.randomUUID().toString());
+        });
+        assertEquals(employeeNaoEncontradoException.getMessage(), "Employee não encontrado");
     }
 
     @Test
+    @Order(4)
     public void atualizarEmployee() throws ComprimentoInvalidoException, EmployeeNaoEncontradoException, ArquivoException, EmailInvalidoException {
         String sobrenome = "Roberto";
         employee1.setSobrenome(sobrenome);
@@ -76,14 +78,15 @@ public class EmployeeTest {
         Employee.atualizarEmployee(employee1);
 
         sobrenomeSalvo = Employee.buscarEmployee(employee1.getId()).getSobrenome();
+        System.out.println(sobrenomeSalvo);
         assertEquals(sobrenomeSalvo, sobrenome);
     }
 
     @Test
+    @Order(7)
     public void apagarEmployee() throws ArquivoException, EmployeeNaoEncontradoException {
-        String id = employee1.getId();
-        //String id = "a74155d8-add4-47e0-80f0-454c66dce0ed";
-        System.out.println(id);
+//        String id = employee1.getId();
+        String id = "14e0984c-eca8-43dc-946d-dbf636d8ef6f";
         Employee.apagarEmployee(id);
 
         Exception employeeNaoEncontradoException =  assertThrows(EmployeeNaoEncontradoException.class, () -> {
@@ -96,6 +99,7 @@ public class EmployeeTest {
     }
 
     @Test
+    @Order(5)
     public void nomeDeveTerComprimentoMaiorQueDois() {
         Exception comprimentoInvalidoException = assertThrows(ComprimentoInvalidoException.class, () ->
         employee1 = new Employee("Ze", "Juvenil", "z.juvenil@ciandt.com")
@@ -107,6 +111,7 @@ public class EmployeeTest {
     }
 
     @Test
+    @Order(6)
     public void sobrenomeDeveTerComprimentoMaiorQueDois() {
         Exception comprimentoInvalidoException = assertThrows(ComprimentoInvalidoException.class, () ->
         employee1 = new Employee("Joao", "ao", "z.juvenil@ciandt.com")
