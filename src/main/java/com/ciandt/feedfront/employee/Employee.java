@@ -5,51 +5,22 @@ import com.ciandt.feedfront.excecoes.ComprimentoInvalidoException;
 import com.ciandt.feedfront.excecoes.EmailInvalidoException;
 import com.ciandt.feedfront.excecoes.EmployeeNaoEncontradoException;
 
-import java.io.*;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.UUID;
 
-public class Employee implements Serializable{
-    private static final long serialVersionUID  = 1L;
+public class Employee {
     private String id;
     private String nome;
     private String sobrenome;
     private String email;
-    private static String arquivoCriado = "employees.ser"; //TODO: alterar de acordo com a sua implementação
-    private static File file = new File(arquivoCriado);
-    private static ObjectOutputStream oos = null;
-    private static ObjectInputStream ois = null;
+
+    String arquivoCriado = "arquivo.extensao"; //TODO: alterar de acordo com a sua implementação
 
     public Employee(String nome, String sobrenome, String email) throws ComprimentoInvalidoException {
-        if (nome.length() <= 2 || sobrenome.length() <= 2)
-            throw new ComprimentoInvalidoException("O nome e sobrenome devem ter mais do que 2 caracteres");
-
         this.id = UUID.randomUUID().toString();
-        this.nome = nome;
-        this.sobrenome = sobrenome;
-        this.email = email;
     }
 
-    public static Employee salvarEmployee(Employee employee) throws EmailInvalidoException, IOException {
-        List<Employee> employeeList;
-
-        employeeList = listarEmployees();
-        employeeList.add(employee);
-        saveFile(employeeList);
-
-        return employee;
-    }
-
-    public static Employee saveFile(List<Employee> object) throws IOException {
-        FileOutputStream fos = new FileOutputStream(file);
-        oos = new ObjectOutputStream(new BufferedOutputStream(fos));
-        oos.writeObject(object);
-        oos.flush();
-        fos.flush();
-
-        oos.close();
-        fos.close();
-
+    public static Employee salvarEmployee(Employee employee) throws ArquivoException, EmailInvalidoException {
         return null;
     }
 
@@ -58,119 +29,39 @@ public class Employee implements Serializable{
     }
 
     public static List<Employee> listarEmployees() throws ArquivoException {
-        ArrayList<Employee> employeeList = new ArrayList<>();
-        try {
-
-            ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
-            employeeList = (ArrayList<Employee>) ois.readObject();
-            ois.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return employeeList;
+        return null;
     }
 
     public static Employee buscarEmployee(String id) throws ArquivoException, EmployeeNaoEncontradoException {
-        ArrayList<Employee> employeeList;
-        Employee employeeFound = null;
-//        ArrayList<Employee> employeeFound = null;
-
-        ListIterator li = null;
-        try {
-            ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
-            employeeList = (ArrayList<Employee>) ois.readObject();
-            ois.close();
-
-//            employeeFound = employeeList.stream()
-//                    .filter(x -> x.id == id)
-//                    .collect(Collectors.toCollection(ArrayList::new));
-            li = employeeList.listIterator();
-            while (li.hasNext()) {
-                Employee e = (Employee) li.next();
-                if (e.id == id)
-                    employeeFound = e;
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return employeeFound;
+        return null;
     }
 
     public static void apagarEmployee(String id) throws ArquivoException, EmployeeNaoEncontradoException {
-        ArrayList<Employee> employeeList;
-//        ListIterator li = null;
-        try {
-            ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
-            employeeList = (ArrayList<Employee>) ois.readObject();
-            ois.close();
-
-            ArrayList<Employee> newEmployeeList = employeeList.stream()
-                    .filter(x -> x.id != id)
-                    .collect(Collectors.toCollection(ArrayList::new));
-
-//            li = employeeList.listIterator();
-//            while (li.hasNext()) {
-//                Employee e = (Employee) li.next();
-//                if (e.id == id) {
-//                    System.out.println(li.nextIndex());
-//                    employeeList.remove(li.nextIndex());
-//                }
-//            }
-            System.out.println("----> " + newEmployeeList);
-            saveFile(newEmployeeList);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     public String getNome() {
-        return this.nome;
+        return null;
     }
 
     public void setNome(String nome) throws ComprimentoInvalidoException {
-        this.nome = nome;
     }
 
     public String getSobrenome() {
-        return this.sobrenome;
+        return null;
     }
 
     public void setSobrenome(String sobrenome) throws ComprimentoInvalidoException {
-        this.sobrenome = sobrenome;
     }
 
     public String getEmail() {
-        return this.email;
+        return null;
     }
 
     public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getId() {
         return id;
     }
 
-    @Override
-    public String toString() {
-        return "Employee{" +
-                "id='" + id + '\'' +
-                ", nome='" + nome + '\'' +
-                ", sobrenome='" + sobrenome + '\'' +
-                ", email='" + email + '\'' +
-                '}';
-    }
 }

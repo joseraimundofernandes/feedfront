@@ -7,22 +7,14 @@ import com.ciandt.feedfront.excecoes.EmailInvalidoException;
 import com.ciandt.feedfront.excecoes.EmployeeNaoEncontradoException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-@ExtendWith(MockitoExtension.class)
+
 public class EmployeeTest {
 
-    //@Mock private FileRepo fileRepo;
     public Employee employee1;
     public Employee employee2;
     @BeforeEach
@@ -32,16 +24,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void shouldSalvarEmployeeTest() throws EmailInvalidoException, IOException, ComprimentoInvalidoException, ClassNotFoundException {
-        employee2 = new Employee("João", "Silveira", "j.silveira@email.com");
-        Employee result = Employee.salvarEmployee(employee2);
-        //Employee result2 = Employee.salvarEmployee(employee2);
-        Employee.listarEmployees();
-        assertEquals(employee2, result);
-    }
-
-    @Test
-    public void salvarEmployeeTest() throws ComprimentoInvalidoException, EmailInvalidoException, IOException, EmployeeNaoEncontradoException {
+    public void salvarEmployeeTest() throws ComprimentoInvalidoException, EmailInvalidoException, ArquivoException, EmployeeNaoEncontradoException {
         employee2 = new Employee("João", "Silveira", "j.silveira@email.com");
 
         Employee.salvarEmployee(employee1);
@@ -59,15 +42,14 @@ public class EmployeeTest {
     @Test
     public void listarEmployees() throws ArquivoException {
         List<Employee> employees = Employee.listarEmployees();
-        System.out.println(employees);
+
         assertTrue(employees.isEmpty() == false);
         assertTrue(employees.size() == 1);
     }
 
     @Test
     public void buscarEmployee() throws ArquivoException, EmployeeNaoEncontradoException{
-        //Employee retornoDePesquisa = Employee.buscarEmployee(employee1.getId());
-        Employee retornoDePesquisa = Employee.buscarEmployee("67c1cd46-6a76-412f-a899-5edf2f110e24");
+        Employee retornoDePesquisa = Employee.buscarEmployee(employee1.getId());
 
         assertEquals(retornoDePesquisa, employee1);
 
@@ -94,8 +76,7 @@ public class EmployeeTest {
 
     @Test
     public void apagarEmployee() throws ArquivoException, EmployeeNaoEncontradoException {
-        //String id = employee1.getId();
-        String id = "67c1cd46-6a76-412f-a899-5edf2f110e24";
+        String id = employee1.getId();
         Employee.apagarEmployee(id);
 
         Exception employeeNaoEncontradoException =  assertThrows(EmployeeNaoEncontradoException.class, () -> {
