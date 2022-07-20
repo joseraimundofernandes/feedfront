@@ -67,9 +67,9 @@ public class EmployeeTest {
     @Test
     public void buscarEmployee() throws ArquivoException, EmployeeNaoEncontradoException{
         //Employee retornoDePesquisa = Employee.buscarEmployee(employee1.getId());
-        Employee retornoDePesquisa = Employee.buscarEmployee("a693f9a2-6c67-4840-8f75-8b2597467b91");
+        Employee retornoDePesquisa = Employee.buscarEmployee("67c1cd46-6a76-412f-a899-5edf2f110e24");
 
-        assertEquals(employee1, retornoDePesquisa);
+        assertEquals(retornoDePesquisa, employee1);
 
         Exception employeeNaoEncontradoException = assertThrows(EmployeeNaoEncontradoException.class, () -> {
                 Employee.buscarEmployee(UUID.randomUUID().toString());
@@ -95,7 +95,7 @@ public class EmployeeTest {
     @Test
     public void apagarEmployee() throws ArquivoException, EmployeeNaoEncontradoException {
         //String id = employee1.getId();
-        String id = "a693f9a2-6c67-4840-8f75-8b2597467b91";
+        String id = "67c1cd46-6a76-412f-a899-5edf2f110e24";
         Employee.apagarEmployee(id);
 
         Exception employeeNaoEncontradoException =  assertThrows(EmployeeNaoEncontradoException.class, () -> {

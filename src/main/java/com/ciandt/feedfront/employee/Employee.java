@@ -76,21 +76,24 @@ public class Employee implements Serializable{
 
     public static Employee buscarEmployee(String id) throws ArquivoException, EmployeeNaoEncontradoException {
         ArrayList<Employee> employeeList;
-//        Employee employeeFound = null;
+        Employee employeeFound = null;
 //        ArrayList<Employee> employeeFound = null;
 
-//        ListIterator li = null;
-        Optional<Employee> employeeFound = null;
+        ListIterator li = null;
         try {
-            ois = new ObjectInputStream(new FileInputStream(file));
+            ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
             employeeList = (ArrayList<Employee>) ois.readObject();
             ois.close();
 
-            employeeFound = Optional.ofNullable(employeeList.stream()
-                    .filter(x -> id.equals(x.getId()))
-                    .findAny()
-                    .orElse(null));
-            System.out.println(employeeFound);
+//            employeeFound = employeeList.stream()
+//                    .filter(x -> x.id == id)
+//                    .collect(Collectors.toCollection(ArrayList::new));
+            li = employeeList.listIterator();
+            while (li.hasNext()) {
+                Employee e = (Employee) li.next();
+                if (e.id == id)
+                    employeeFound = e;
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -98,20 +101,30 @@ public class Employee implements Serializable{
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return employeeFound.get();
+        return employeeFound;
     }
 
     public static void apagarEmployee(String id) throws ArquivoException, EmployeeNaoEncontradoException {
         ArrayList<Employee> employeeList;
+//        ListIterator li = null;
         try {
             ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
             employeeList = (ArrayList<Employee>) ois.readObject();
             ois.close();
 
-            List<Employee> newEmployeeList = employeeList.stream()
-                    .filter(x -> !id.equals(x.getId()))
+            ArrayList<Employee> newEmployeeList = employeeList.stream()
+                    .filter(x -> x.id != id)
                     .collect(Collectors.toCollection(ArrayList::new));
 
+//            li = employeeList.listIterator();
+//            while (li.hasNext()) {
+//                Employee e = (Employee) li.next();
+//                if (e.id == id) {
+//                    System.out.println(li.nextIndex());
+//                    employeeList.remove(li.nextIndex());
+//                }
+//            }
+            System.out.println("----> " + newEmployeeList);
             saveFile(newEmployeeList);
 
         } catch (FileNotFoundException e) {
