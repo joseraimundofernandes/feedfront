@@ -10,13 +10,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Employee implements Serializable{
-    private static final long serialVersionUID = -897856973823710492L;
+    private static final long serialVersionUID  = 1L;
     private String id;
     private String nome;
     private String sobrenome;
     private String email;
     private static String arquivoCriado = "employees.ser"; //TODO: alterar de acordo com a sua implementação
-    private static File file = null;
+    private static File file = new File(arquivoCriado);
     private static ObjectOutputStream oos = null;
     private static ObjectInputStream ois = null;
 
@@ -28,8 +28,6 @@ public class Employee implements Serializable{
         this.nome = nome;
         this.sobrenome = sobrenome;
         this.email = email;
-
-        this.file = new File(arquivoCriado);
     }
 
     public static Employee salvarEmployee(Employee employee) throws EmailInvalidoException, IOException {
@@ -55,17 +53,8 @@ public class Employee implements Serializable{
         return null;
     }
 
-    public static Employee atualizarEmployee(Employee employee) throws EmailInvalidoException, EmployeeNaoEncontradoException, ArquivoException {
-        try {
-            Employee OldEmployee = buscarEmployee(employee.getId());
-            if (OldEmployee != null) {
-                apagarEmployee(OldEmployee.getId());
-                salvarEmployee(employee);
-            }
-        } catch (IOException e) {
-            throw new ArquivoException("");
-        }
-        return employee;
+    public static Employee atualizarEmployee(Employee employee) throws ArquivoException, EmailInvalidoException {
+        return null;
     }
 
     public static List<Employee> listarEmployees() throws ArquivoException {
@@ -87,8 +76,11 @@ public class Employee implements Serializable{
 
     public static Employee buscarEmployee(String id) throws ArquivoException, EmployeeNaoEncontradoException {
         ArrayList<Employee> employeeList;
-        Optional<Employee> employeeFound = null;
+//        Employee employeeFound = null;
+//        ArrayList<Employee> employeeFound = null;
 
+//        ListIterator li = null;
+        Optional<Employee> employeeFound = null;
         try {
             ois = new ObjectInputStream(new FileInputStream(file));
             employeeList = (ArrayList<Employee>) ois.readObject();
@@ -98,10 +90,7 @@ public class Employee implements Serializable{
                     .filter(x -> id.equals(x.getId()))
                     .findAny()
                     .orElse(null));
-
-            if (employeeFound.get() == null) {
-                throw new EmployeeNaoEncontradoException("Employee não encontrado");
-            }
+            System.out.println(employeeFound);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -115,18 +104,13 @@ public class Employee implements Serializable{
     public static void apagarEmployee(String id) throws ArquivoException, EmployeeNaoEncontradoException {
         ArrayList<Employee> employeeList;
         try {
-            FileInputStream fos = new FileInputStream(file);
-            ois = new ObjectInputStream(new BufferedInputStream(fos));
+            ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
             employeeList = (ArrayList<Employee>) ois.readObject();
             ois.close();
 
             List<Employee> newEmployeeList = employeeList.stream()
                     .filter(x -> !id.equals(x.getId()))
                     .collect(Collectors.toCollection(ArrayList::new));
-
-            if (newEmployeeList.size() == employeeList.size()) {
-                throw new EmployeeNaoEncontradoException("Employee não existe no repositório");
-            }
 
             saveFile(newEmployeeList);
 
