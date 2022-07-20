@@ -41,7 +41,7 @@ public class FileRepository {
         }
         return file;
     }
-    public static Employee findById(String path, String id) throws ArquivoException, EmployeeNaoEncontradoException {
+    public static Employee findById(String path, String id) throws ArquivoException {
         List<Employee> fileList;
         Optional<Employee> objectFound;
         try {
@@ -55,39 +55,5 @@ public class FileRepository {
             throw new ArquivoException("");
         }
         return objectFound.get();
-    }
-    public static Employee update(String path, Employee employee) throws ArquivoException {
-        List<Employee> newEmployeeList;
-        Employee OldEmployee;
-        try {
-            OldEmployee = findById(path, employee.getId());
-            if (OldEmployee != null) {
-                newEmployeeList = deleteById(path, OldEmployee.getId());
-                newEmployeeList.add(employee);
-                saveFile(path, newEmployeeList);
-            }
-        } catch (IOException e) {
-            throw new ArquivoException("");
-        } catch (EmployeeNaoEncontradoException e) {
-            throw new RuntimeException(e);
-        }
-        return OldEmployee;
-    }
-    public static List<Employee> deleteById(String path, String id) throws ArquivoException {
-        List<Employee> fileList;
-        List<Employee> newEmployeeList;
-        try {
-            fileList = (ArrayList<Employee>) getFile(path);
-
-            newEmployeeList = fileList.stream()
-                    .filter(x -> !id.equals(x.getId()))
-                    .collect(Collectors.toCollection(ArrayList::new));
-
-            saveFile(path, newEmployeeList);
-
-        } catch (IOException e) {
-            throw new ArquivoException("");
-        }
-        return newEmployeeList;
     }
 }

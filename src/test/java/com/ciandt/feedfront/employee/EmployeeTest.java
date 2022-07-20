@@ -83,10 +83,9 @@ public class EmployeeTest {
     }
 
     @Test
-    @Order(7)
+    @Order(5)
     public void apagarEmployee() throws ArquivoException, EmployeeNaoEncontradoException {
-//        String id = employee1.getId();
-        String id = "14e0984c-eca8-43dc-946d-dbf636d8ef6f";
+        String id = employee1.getId();
         Employee.apagarEmployee(id);
 
         Exception employeeNaoEncontradoException =  assertThrows(EmployeeNaoEncontradoException.class, () -> {
@@ -94,12 +93,12 @@ public class EmployeeTest {
         });
 
         String mensagemRecebida = employeeNaoEncontradoException.getMessage();
-        String mensagemEsperada = "Employee não existe no repositório";
+        String mensagemEsperada = "Employee não encontrado";
         assertEquals(mensagemEsperada, mensagemRecebida);
     }
 
     @Test
-    @Order(5)
+    @Order(6)
     public void nomeDeveTerComprimentoMaiorQueDois() {
         Exception comprimentoInvalidoException = assertThrows(ComprimentoInvalidoException.class, () ->
         employee1 = new Employee("Ze", "Juvenil", "z.juvenil@ciandt.com")
@@ -111,7 +110,7 @@ public class EmployeeTest {
     }
 
     @Test
-    @Order(6)
+    @Order(7)
     public void sobrenomeDeveTerComprimentoMaiorQueDois() {
         Exception comprimentoInvalidoException = assertThrows(ComprimentoInvalidoException.class, () ->
         employee1 = new Employee("Joao", "ao", "z.juvenil@ciandt.com")

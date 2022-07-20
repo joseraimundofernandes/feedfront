@@ -7,6 +7,7 @@ import com.ciandt.feedfront.excecoes.EmployeeNaoEncontradoException;
 
 import java.io.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.ciandt.feedfront.repositories.FileRepository.*;
 
@@ -19,8 +20,10 @@ public class Employee implements Serializable{
     private static String path = "src/main/resources/employees.txt"; //TODO: alterar de acordo com a sua implementação
 
     public Employee(String nome, String sobrenome, String email) throws ComprimentoInvalidoException {
-        if (nome.length() <= 2 || sobrenome.length() <= 2)
-            throw new ComprimentoInvalidoException("O nome e sobrenome devem ter mais do que 2 caracteres");
+        if (nome.length() <= 2)
+            throw new ComprimentoInvalidoException("Comprimento do nome deve ser maior que 2 caracteres.");
+        if (sobrenome.length() <= 2)
+            throw new ComprimentoInvalidoException("Comprimento do sobrenome deve ser maior que 2 caracteres.");
 
         this.id = UUID.randomUUID().toString();
         this.nome = nome;
@@ -49,7 +52,19 @@ public class Employee implements Serializable{
         return employee;
     }
     public static Employee atualizarEmployee(Employee employee) throws EmailInvalidoException, EmployeeNaoEncontradoException, ArquivoException {
-        update(path, employee);
+//        update(path, employee);
+        List<Employee> newEmployeeList;
+        Employee oldEmployee;
+        try {
+            oldEmployee = findById(path, employee.getId());
+            if (oldEmployee != null) {
+                newEmployeeList = apagarEmployee(oldEmployee.getId());
+                newEmployeeList.add(employee);
+                saveFile(path, newEmployeeList);
+            }
+        } catch (IOException e) {
+            throw new ArquivoException("");
+        }
 
         return employee;
     }
@@ -77,19 +92,25 @@ public class Employee implements Serializable{
         }
         return employeeFound;
     }
-    public static void apagarEmployee(String id) throws ArquivoException, EmployeeNaoEncontradoException {
-        List<Employee> employeeList;
-        if (isFile(path)){
-            employeeList = listarEmployees();
-            boolean isId = employeeList.stream()
-                    .anyMatch(e -> e.id.equals(id));
-            if (!isId) {
-                throw new EmployeeNaoEncontradoException("Employee não existe no repositório");
-            }
-            else {
-                deleteById(path, id);
-            }
+    public static List<Employee> apagarEmployee(String id) throws EmployeeNaoEncontradoException, ArquivoException {
+//        deleteById(path, id)
+        List<Employee> fileList;
+        List<Employee> newEmployeeList;
+        try {
+            fileList = (ArrayList<Employee>) getFile(path);
+
+            newEmployeeList = fileList.stream()
+                    .filter(x -> !id.equals(x.getId()))
+                    .collect(Collectors.toCollection(ArrayList::new));
+
+            saveFile(path, newEmployeeList);
+
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+            throw new ArquivoException("");
         }
+        return newEmployeeList;
     }
 
     public String getNome() {
