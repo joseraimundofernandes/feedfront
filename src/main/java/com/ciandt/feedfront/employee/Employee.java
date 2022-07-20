@@ -7,8 +7,7 @@ import com.ciandt.feedfront.excecoes.EmployeeNaoEncontradoException;
 
 import java.io.*;
 import java.util.*;
-
-import static com.ciandt.feedfront.repositories.FileRepository.*;
+import java.util.stream.Collectors;
 
 public class Employee implements Serializable{
     private static final long serialVersionUID = -897856973823710492L;
@@ -16,7 +15,10 @@ public class Employee implements Serializable{
     private String nome;
     private String sobrenome;
     private String email;
-    private static String path = "src/main/resources/employees.txt"; //TODO: alterar de acordo com a sua implementação
+    private static String arquivoCriado = "employees.ser"; //TODO: alterar de acordo com a sua implementação
+    private static File file = null;
+    private static ObjectOutputStream oos = null;
+    private static ObjectInputStream ois = null;
 
     public Employee(String nome, String sobrenome, String email) throws ComprimentoInvalidoException {
         if (nome.length() <= 2 || sobrenome.length() <= 2)
@@ -26,69 +28,114 @@ public class Employee implements Serializable{
         this.nome = nome;
         this.sobrenome = sobrenome;
         this.email = email;
+
+        this.file = new File(arquivoCriado);
     }
 
     public static Employee salvarEmployee(Employee employee) throws EmailInvalidoException, IOException {
-        List<Employee> employeeList = new ArrayList<>();
+        List<Employee> employeeList;
 
-        if (isFile(path)){
-            employeeList = listarEmployees();
-            boolean isEmail = employeeList.stream()
-                    .anyMatch(e -> e.email.equals(employee.email));
-            if (isEmail) {
-                throw new EmailInvalidoException("E-mail ja cadastrado no repositorio");
+        employeeList = listarEmployees();
+        employeeList.add(employee);
+        saveFile(employeeList);
+
+        return employee;
+    }
+
+    public static Employee saveFile(List<Employee> object) throws IOException {
+        FileOutputStream fos = new FileOutputStream(file);
+        oos = new ObjectOutputStream(new BufferedOutputStream(fos));
+        oos.writeObject(object);
+        oos.flush();
+        fos.flush();
+
+        oos.close();
+        fos.close();
+
+        return null;
+    }
+
+    public static Employee atualizarEmployee(Employee employee) throws EmailInvalidoException, EmployeeNaoEncontradoException, ArquivoException {
+        try {
+            Employee OldEmployee = buscarEmployee(employee.getId());
+            if (OldEmployee != null) {
+                apagarEmployee(OldEmployee.getId());
+                salvarEmployee(employee);
             }
-            else {
-                employeeList.add(employee);
-                saveFile(path, employeeList);
-            }
-        } else {
-            employeeList.add(employee);
-            saveFile(path, employeeList);
+        } catch (IOException e) {
+            throw new ArquivoException("");
         }
         return employee;
     }
-    public static Employee atualizarEmployee(Employee employee) throws EmailInvalidoException, EmployeeNaoEncontradoException, ArquivoException {
-        update(path, employee);
 
-        return employee;
-    }
     public static List<Employee> listarEmployees() throws ArquivoException {
-        List<Employee> employeeList;
+        ArrayList<Employee> employeeList = new ArrayList<>();
+        try {
 
-        employeeList = (ArrayList<Employee>) getFile(path);
-
+            ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
+            employeeList = (ArrayList<Employee>) ois.readObject();
+            ois.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         return employeeList;
     }
-    public static Employee buscarEmployee(String id) throws ArquivoException, EmployeeNaoEncontradoException {
-        List<Employee> employeeList;
-        Employee employeeFound = null;
 
-        if (isFile(path)){
-            employeeList = listarEmployees();
-            boolean isId = employeeList.stream()
-                    .anyMatch(e -> e.id.equals(id));
-            if (!isId) {
+    public static Employee buscarEmployee(String id) throws ArquivoException, EmployeeNaoEncontradoException {
+        ArrayList<Employee> employeeList;
+        Optional<Employee> employeeFound = null;
+
+        try {
+            ois = new ObjectInputStream(new FileInputStream(file));
+            employeeList = (ArrayList<Employee>) ois.readObject();
+            ois.close();
+
+            employeeFound = Optional.ofNullable(employeeList.stream()
+                    .filter(x -> id.equals(x.getId()))
+                    .findAny()
+                    .orElse(null));
+
+            if (employeeFound.get() == null) {
                 throw new EmployeeNaoEncontradoException("Employee não encontrado");
             }
-            else {
-                employeeFound = findById(path, id);
-            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        return employeeFound;
+        return employeeFound.get();
     }
+
     public static void apagarEmployee(String id) throws ArquivoException, EmployeeNaoEncontradoException {
-        List<Employee> employeeList;
-        if (isFile(path)){
-            employeeList = listarEmployees();
-            boolean isId = employeeList.stream()
-                    .anyMatch(e -> e.id.equals(id));
-            if (!isId) {
+        ArrayList<Employee> employeeList;
+        try {
+            FileInputStream fos = new FileInputStream(file);
+            ois = new ObjectInputStream(new BufferedInputStream(fos));
+            employeeList = (ArrayList<Employee>) ois.readObject();
+            ois.close();
+
+            List<Employee> newEmployeeList = employeeList.stream()
+                    .filter(x -> !id.equals(x.getId()))
+                    .collect(Collectors.toCollection(ArrayList::new));
+
+            if (newEmployeeList.size() == employeeList.size()) {
                 throw new EmployeeNaoEncontradoException("Employee não existe no repositório");
             }
-            else {
-                deleteById(path, id);
-            }
+
+            saveFile(newEmployeeList);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
