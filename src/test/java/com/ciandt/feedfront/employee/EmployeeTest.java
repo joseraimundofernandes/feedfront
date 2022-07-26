@@ -1,10 +1,8 @@
 package com.ciandt.feedfront.employee;
 
 
-import com.ciandt.feedfront.excecoes.ArquivoException;
-import com.ciandt.feedfront.excecoes.ComprimentoInvalidoException;
-import com.ciandt.feedfront.excecoes.EmailInvalidoException;
-import com.ciandt.feedfront.excecoes.EmployeeNaoEncontradoException;
+import com.ciandt.feedfront.excecoes.*;
+import com.ciandt.feedfront.models.Employee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +56,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void buscarEmployee() throws ArquivoException, EmployeeNaoEncontradoException, EmailInvalidoException {
+    public void buscarEmployee() throws ArquivoException, EmployeeNaoEncontradoException, EmailInvalidoException, EntidadeNaoEncontradaException {
         Employee retornoDePesquisa = Employee.buscarEmployee(employee1.getId());
 
         assertEquals(retornoDePesquisa, employee1);
@@ -71,7 +69,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void atualizarEmployee() throws ComprimentoInvalidoException, EmployeeNaoEncontradoException, ArquivoException, EmailInvalidoException {
+    public void atualizarEmployee() throws ComprimentoInvalidoException, EmployeeNaoEncontradoException, ArquivoException, EmailInvalidoException, EntidadeNaoEncontradaException {
         String sobrenome = "Roberto";
         employee1.setSobrenome(sobrenome);
 
@@ -85,7 +83,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void apagarEmployee() throws ArquivoException, EmployeeNaoEncontradoException {
+    public void apagarEmployee() throws ArquivoException, EmployeeNaoEncontradoException, EntidadeNaoEncontradaException {
         String id = employee1.getId();
         Employee.apagarEmployee(id);
 
