@@ -32,7 +32,7 @@ public class FeedbackServiceTest {
     private Service<Feedback> service;
 
     @BeforeEach
-    public void initEach() throws IOException , ComprimentoInvalidoException {
+    public void initEach() throws IOException, BusinessException {
         // Este trecho de código serve somente para limpar o repositório
         Files.walk(Paths.get("src/main/resources/data/feedback/"))
                 .filter(p -> p.toString().endsWith(".byte"))

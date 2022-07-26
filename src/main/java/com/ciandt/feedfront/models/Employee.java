@@ -21,7 +21,7 @@ public class Employee implements Serializable {
     private String sobrenome;
     private String email;
     private String arquivo; //TODO: alterar de acordo com a sua implementação
-    private static final String repositorioPath = "src/main/resources/data/employee/"; //TODO: alterar de acordo com a sua implementação
+    public static final String repositorioPath = "src/main/resources/data/employee/"; //TODO: alterar de acordo com a sua implementação
 
     private static final long serialVersionID = 1;
 
@@ -35,11 +35,11 @@ public class Employee implements Serializable {
         setSobrenome(sobrenome);
     }
 
-    private static ObjectOutputStream getOutputStream(String arquivo) throws IOException {
+    public static ObjectOutputStream getOutputStream(String arquivo) throws IOException {
         return new ObjectOutputStream(new FileOutputStream(arquivo));
     }
 
-    private static ObjectInputStream getInputStream(String arquivo) throws IOException {
+    public static ObjectInputStream getInputStream(String arquivo) throws IOException {
         return new ObjectInputStream(new FileInputStream(arquivo));
     }
 
@@ -191,4 +191,17 @@ public class Employee implements Serializable {
         return id;
     }
 
+    public String getArquivo() {
+        return this.arquivo;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{" +
+                "id='" + id + '\'' +
+                ", nome='" + nome + '\'' +
+                ", sobrenome='" + sobrenome + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }
