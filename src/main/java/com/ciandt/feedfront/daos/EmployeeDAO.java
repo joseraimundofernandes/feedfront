@@ -7,8 +7,6 @@ import com.ciandt.feedfront.models.Employee;
 import com.ciandt.feedfront.excecoes.EntidadeNaoSerializavelException;
 
 import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,19 +16,43 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.ciandt.feedfront.models.Employee.getInputStream;
-import static com.ciandt.feedfront.models.Employee.getOutputStream;
-
 public class EmployeeDAO implements DAO<Employee> {
-    private String repositorioPath = Employee.repositorioPath;
+    private String repositorioPath = "src/main/resources/data/employee/";
 
     @Override
     public boolean tipoImplementaSerializable() {
-        throw new UnsupportedOperationException();
+        return Employee.class instanceof Serializable;
+    }
+
+    public static ObjectOutputStream getOutputStream(String arquivo) throws IOException {
+        return new ObjectOutputStream(new FileOutputStream(arquivo));
+    }
+
+    public static ObjectInputStream getInputStream(String arquivo) throws IOException {
+        return new ObjectInputStream(new FileInputStream(arquivo));
+    }
+
+    @Override
+    public boolean isEmailExistente(Employee employee) throws IOException {
+        boolean isEmailExistente = false;
+        List<Employee> employees = listar();
+
+        for (Employee employeeSalvo: employees) {
+            if (!employeeSalvo.getId().equals(employee.getId()) && employeeSalvo.getEmail().equals(employee.getEmail())) {
+                isEmailExistente = true;
+                break;
+            }
+        }
+
+        return isEmailExistente;
     }
 
     @Override
     public List<Employee> listar() throws IOException, EntidadeNaoSerializavelException {
+        if (!this.tipoImplementaSerializable()) {
+            throw new EntidadeNaoSerializavelException("Employee não é serializável");
+        }
+
         List<Employee> employees = new ArrayList<>();
 
         try {
@@ -57,6 +79,10 @@ public class EmployeeDAO implements DAO<Employee> {
 
     @Override
     public Employee buscar(String id) throws IOException, EntidadeNaoSerializavelException, EmployeeNaoEncontradoException {
+        if (!this.tipoImplementaSerializable()) {
+            throw new EntidadeNaoSerializavelException("Employee não é serializável");
+        }
+
         Employee employee;
         ObjectInputStream inputStream;
 
@@ -72,26 +98,17 @@ public class EmployeeDAO implements DAO<Employee> {
 
         return employee;
     }
-    @Override
-    public boolean isEmailExistente(Employee employee) throws IOException {
-        boolean isEmailExistente = false;
-        List<Employee> employees = listar();
 
-        for (Employee employeeSalvo: employees) {
-            if (!employeeSalvo.getId().equals(employee.getId()) && employeeSalvo.getEmail().equals(employee.getEmail())) {
-                isEmailExistente = true;
-                break;
-            }
-        }
-
-        return isEmailExistente;
-    }
     @Override
     public Employee salvar(Employee employee) throws IOException, EntidadeNaoSerializavelException {
+        if (!this.tipoImplementaSerializable()) {
+            throw new EntidadeNaoSerializavelException("Employee não é serializável");
+        }
+
         ObjectOutputStream outputStream;
 
         try {
-            outputStream = getOutputStream(employee.getArquivo());
+            outputStream = getOutputStream(repositorioPath + employee.getArquivo());
             outputStream.writeObject(employee);
 
             outputStream.close();
@@ -107,17 +124,19 @@ public class EmployeeDAO implements DAO<Employee> {
 
     @Override
     public boolean apagar(String id) throws IOException, EntidadeNaoSerializavelException, EmployeeNaoEncontradoException {
+        if (!this.tipoImplementaSerializable()) {
+            throw new EntidadeNaoSerializavelException("Employee não é serializável");
+        }
+
         Employee employee = buscar(id);
-        boolean isApagado;
 
         if (Objects.isNull(employee)) {
             throw new EmployeeNaoEncontradoException("Employee não encontrado");
         }
         else {
             new File(String.format("%s%s.byte", repositorioPath, id)).delete();
-            isApagado = true;
         }
 
-        return isApagado;
+        return true;
     }
 }

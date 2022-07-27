@@ -13,7 +13,7 @@ public interface Service<E> {
 
     E buscar(String id) throws ArquivoException, BusinessException;
 
-    E salvar(E e) throws ArquivoException, BusinessException, IllegalArgumentException;
+    E salvar(E e) throws IOException, BusinessException, IllegalArgumentException;
 
     E atualizar(E e) throws IOException, BusinessException, IllegalArgumentException;
 
