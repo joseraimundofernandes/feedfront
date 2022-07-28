@@ -52,7 +52,7 @@ public class EmployeeDAOTest {
         assertThrows(IOException.class, () -> employeeDAO.buscar(idInvalido));
         Employee employeSalvo = assertDoesNotThrow(() -> employeeDAO.buscar(idValido));
 
-        assertEquals(employeSalvo, employee);
+        assertEquals(employeSalvo.getId(), employee.getId());
     }
 
     @Test

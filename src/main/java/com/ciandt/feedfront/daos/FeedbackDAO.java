@@ -8,7 +8,13 @@ import com.ciandt.feedfront.models.Employee;
 import com.ciandt.feedfront.models.Feedback;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FeedbackDAO implements DAO<Feedback> {
 
@@ -26,13 +32,33 @@ public class FeedbackDAO implements DAO<Feedback> {
 
     @Override
     public List<Feedback> listar() throws IOException, EntidadeNaoSerializavelException {
-        return null;
+        List<Feedback> feedbacks = new ArrayList<>();
+
+        try {
+            Stream<Path> paths = Files.walk(Paths.get(repositorioPath));
+
+            List<String> files = paths
+                    .map(p -> p.getFileName().toString())
+                    .filter(p -> p.endsWith(".byte"))
+                    .map(p -> p.replace(".byte", ""))
+                    .collect(Collectors.toList());
+
+            for (String file: files) {
+                feedbacks.add(buscar(file));
+            }
+
+            paths.close();
+
+        } catch (IOException e) {
+            throw new ArquivoException("erro ao processar arquivos");
+        }
+
+        return feedbacks;
     }
 
     @Override
     public Feedback buscar(String id) throws IOException, EntidadeNaoSerializavelException {
         Feedback feedback;
-
         ObjectInputStream inputStream;
 
         try {

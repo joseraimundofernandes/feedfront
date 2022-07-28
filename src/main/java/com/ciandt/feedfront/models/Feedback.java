@@ -23,6 +23,7 @@ public class Feedback implements Serializable {
     private String comoMelhora;
 
     private static final long serialVersionID = 1;
+
     public Feedback(LocalDate localDate, Employee autor, Employee proprietario, String descricao) {
         this.id = UUID.randomUUID().toString();
         this.arquivo = getId() + ".byte";
