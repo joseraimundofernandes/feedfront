@@ -11,9 +11,11 @@ import org.mockito.Mockito;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 // O Service deve ser capaz de trabalhar em conjunto com o DAO para executar as tarefas
@@ -37,7 +39,7 @@ public class EmployeeServiceTest {
 
     @Test
     public void listar() throws IOException {
-        when(employeeDAO.listar()).thenReturn(List.of(employee));
+        when(employeeDAO.listar()).thenReturn(Arrays.asList(employee));
 
         List<Employee> employees = employeeService.listar();
 
@@ -49,7 +51,7 @@ public class EmployeeServiceTest {
     // Nota: esses dois métodos estão testando o "buscar" do service
     // Mas estão separados para reforçar a independência dos testes como manda o padrão FIRST: https://hackernoon.com/test-f-i-r-s-t-65e42f3adc17
     @Test
-    public void buscarMalSucedida() throws IOException {
+    public void buscarMalSucedida() throws IOException, EmployeeNaoEncontradoException {
         String uuid = "11f2105a-4f5b-4a48-bf57-3a4ff8b477b1";
 
         when(employeeDAO.buscar(uuid)).thenThrow(FileNotFoundException.class);
@@ -59,7 +61,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void buscarBemSucedida() throws IOException {
+    public void buscarBemSucedida() throws IOException, EmployeeNaoEncontradoException {
         String uuid = employee.getId();
 
         when(employeeDAO.buscar(uuid)).thenReturn(employee);
@@ -71,11 +73,14 @@ public class EmployeeServiceTest {
 
     @Test
     public void salvar() throws IOException, ComprimentoInvalidoException {
+
         Employee employeeValido = new Employee("João", "Silveira", "joao.silveira@email.com");
         Employee employeeInvalido = new Employee("José", "Silveira", "j.silveira@email.com");
 
         when(employeeDAO.salvar(employeeValido)).thenReturn(employeeValido);
-        when(employeeDAO.listar()).thenReturn(List.of(employee, employeeValido));
+        when(employeeDAO.listar()).thenReturn(Arrays.asList(employee, employeeValido));
+
+        when(employeeDAO.isEmailExistente(employeeInvalido)).thenReturn(true);
 
         assertDoesNotThrow(() -> employeeService.salvar(employeeValido));
         Exception exception1 = assertThrows(EmailInvalidoException.class, () -> employeeService.salvar(employeeInvalido));
@@ -86,7 +91,7 @@ public class EmployeeServiceTest {
     }
 
     @Test
-    public void atualizar() throws IOException, ComprimentoInvalidoException, BusinessException, ArquivoException {
+    public void atualizar() throws IOException, ComprimentoInvalidoException, BusinessException, ArquivoException, EmployeeNaoEncontradoException {
         Employee employee2 = new Employee("Bruno", "Silveira", "b.silveira@email.com");
         Employee employee3 = new Employee("Vitor", "Fernandes", "vf.silveira@email.com");
 
@@ -97,7 +102,7 @@ public class EmployeeServiceTest {
 
         employeeService.salvar(employee);
 
-        when(employeeDAO.listar()).thenReturn(List.of(employee));
+        when(employeeDAO.listar()).thenReturn(Arrays.asList(employee));
 
         employeeService.salvar(employee2);
 
@@ -105,17 +110,19 @@ public class EmployeeServiceTest {
         employee2.setNome("Jean");
         employee2.setEmail("joao.silveira@email.com");
 
+        when(employeeDAO.isEmailExistente(employee2)).thenReturn(true);
+
         Employee employeeSalvo = assertDoesNotThrow(() -> employeeService.atualizar(employee));
 
         assertEquals(employee, employeeSalvo);
         assertThrows(EntidadeNaoEncontradaException.class, () -> employeeService.atualizar(employee3));
         Exception exception = assertThrows(EmailInvalidoException.class, () -> employeeService.atualizar(employee2));
 
-        assertEquals("E-mail ja cadastrado no repositorio", exception.getMessage());
+        assertEquals("já existe um employee cadastrado com esse e-mail", exception.getMessage());
     }
 
     @Test
-    public void apagar() throws IOException, ComprimentoInvalidoException {
+    public void apagar() throws IOException, ComprimentoInvalidoException, EmployeeNaoEncontradoException {
         Employee employee2 = new Employee("Bruno", "Silveira", "b.silveira@email.com");
         String uuidValido = employee.getId();
         String uuidInvalido = employee2.getId();
