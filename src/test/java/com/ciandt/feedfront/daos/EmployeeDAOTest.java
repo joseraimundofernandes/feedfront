@@ -84,7 +84,7 @@ public class EmployeeDAOTest {
     }
 
     @Test
-    public void atualizarDados() {
+    public void atualizarDados() throws ComprimentoInvalidoException {
         employee.setNome("mario");
         employee.setEmail("m.silveira@email.com");
 

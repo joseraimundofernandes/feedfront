@@ -4,12 +4,18 @@ import com.ciandt.feedfront.excecoes.ComprimentoInvalidoException;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-
+@Entity
 public class Feedback {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(nullable = false)
     private String descricao;
+    @Column
     private String oQueMelhora;
+    @Column
     private String comoMelhora;
+    @Column(nullable = false)
     private LocalDate data;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -24,11 +30,19 @@ public class Feedback {
     }
 
     public Feedback(LocalDate data, Employee autor, Employee proprietario, String descricao) throws ComprimentoInvalidoException {
-        throw new UnsupportedOperationException();
+        setData(data);
+        setAutor(autor);
+        setProprietario(proprietario);
+        setDescricao(descricao);
     }
 
     public Feedback(LocalDate data, Employee autor, Employee proprietario, String descricao, String oQueMelhora, String comoMelhora) throws ComprimentoInvalidoException {
-        throw new UnsupportedOperationException();
+        setData(data);
+        setAutor(autor);
+        setProprietario(proprietario);
+        setDescricao(descricao);
+        setoQueMelhora(oQueMelhora);
+        setComoMelhora(comoMelhora);
     }
 
     public Long getId() {
@@ -87,5 +101,16 @@ public class Feedback {
         this.proprietario = proprietario;
     }
 
-    // TODO: implementar toString
+    @Override
+    public String toString() {
+        return "Feedback{" +
+                "id=" + id +
+                ", descricao='" + descricao + '\'' +
+                ", oQueMelhora='" + oQueMelhora + '\'' +
+                ", comoMelhora='" + comoMelhora + '\'' +
+                ", data=" + data +
+                ", autor=" + autor +
+                ", proprietario=" + proprietario +
+                '}';
+    }
 }
