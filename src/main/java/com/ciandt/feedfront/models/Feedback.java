@@ -1,43 +1,49 @@
 package com.ciandt.feedfront.models;
 
-import com.ciandt.feedfront.exceptions.ComprimentoInvalidoException;
+import org.hibernate.validator.constraints.Length;
+
+import javax.persistence.*;
 import java.time.LocalDate;
 
-//TODO: UTILIZE ANOTAÇÕES DO LOMBOK COMO @ALLARGSCONSTRUTOR E RETIRE O QUE NÃO FOR MAIS NECESSÁRIO COMO O CONSTRUTOR COM TODOS OS ARGUMENTOS. DEIXE SEU CÓDIGO MAIS SUSCINTO.
-
-
-
-
+@Entity
 public class Feedback {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Column
-    @Length(min = 3)
+    @Column(nullable = false)
+    @Length(min = 3, message = "A descrição deve ter mais de 2 caracteres")
     private String descricao;
     @Column
     private String oQueMelhora;
     @Column
     private String comoMelhora;
-    @Column
+    @Column(nullable = false)
     private LocalDate data;
 
-    @ManyToOne //(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "autor_id")
     private Employee autor;
 
-    @ManyToOne //(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "proprietario_id", nullable = false)
     private Employee proprietario;
 
-    public Feedback() {
+    public Feedback() {}
+
+    public Feedback(LocalDate data, Employee autor, Employee proprietario, String descricao) {
+        setData(data);
+        setAutor(autor);
+        setProprietario(proprietario);
+        setDescricao(descricao);
     }
 
-    public Feedback(LocalDate data, Employee autor, Employee proprietario, String descricao) throws ComprimentoInvalidoException {
-        throw new UnsupportedOperationException();
-    }
-
-    public Feedback(LocalDate data, Employee autor, Employee proprietario, String descricao, String oQueMelhora, String comoMelhora) throws ComprimentoInvalidoException {
-        throw new UnsupportedOperationException();
+    public Feedback(LocalDate data, Employee autor, Employee proprietario, String descricao, String oQueMelhora, String comoMelhora) {
+        setData(data);
+        setAutor(autor);
+        setProprietario(proprietario);
+        setDescricao(descricao);
+        setOQueMelhora(oQueMelhora);
+        setComoMelhora(comoMelhora);
     }
 
     public Long getId() {
@@ -60,7 +66,7 @@ public class Feedback {
         return oQueMelhora;
     }
 
-    public void setoQueMelhora(String oQueMelhora) {
+    public void setOQueMelhora(String oQueMelhora) {
         this.oQueMelhora = oQueMelhora;
     }
 
@@ -80,5 +86,19 @@ public class Feedback {
         this.data = data;
     }
 
+    public Employee getAutor() {
+        return autor;
+    }
 
+    public void setAutor(Employee autor) {
+        this.autor = autor;
+    }
+
+    public Employee getProprietario() {
+        return proprietario;
+    }
+
+    public void setProprietario(Employee proprietario) {
+        this.proprietario = proprietario;
+    }
 }

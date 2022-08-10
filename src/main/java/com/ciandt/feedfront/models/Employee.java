@@ -1,50 +1,44 @@
 package com.ciandt.feedfront.models;
 
 import com.ciandt.feedfront.exceptions.ComprimentoInvalidoException;
+import org.hibernate.validator.constraints.Length;
 
-
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
-
-//TODO: UTILIZE ANOTAÇÕES DO LOMBOK COMO @ALLARGSCONSTRUTOR E RETIRE O QUE NÃO FOR MAIS NECESSÁRIO COMO O CONSTRUTOR COM TODOS OS ARGUMENTOS. DEIXE SEU CÓDIGO MAIS SUSCINTO.
-
-
+@Entity
 public class Employee {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    @Length(min = 3)
-    @Column // (nullable = false)
+
+    @Length(min = 3, message = "O nome deve ter mais de 2 caracteres")
+    @Column(nullable = false)
     private String nome;
-    @Length(min = 3)
-    @Column // (nullable = false)
+
+    @Length(min = 3, message = "O sobrenome deve ter mais de 2 caracteres")
+    @Column(nullable = false)
     private String sobrenome;
 
-    @Column // (unique = true)
+    @Column(unique = true, nullable = false)
+    @Email(message = "Já existe um cadastro com esse email")
     private String email;
 
-    @OneToMany // fetch = FetchType.LAZY
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Feedback> feedbackFeitos;
 
-    @OneToMany // fetch = FetchType.LAZY
+    @OneToMany(mappedBy = "proprietario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Feedback> feedbackRecebidos;
 
+    public Employee() {}
+
     public Employee(String nome, String sobrenome, String email) throws ComprimentoInvalidoException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Employee employee = (Employee) o;
-        return Objects.equals(id, employee.id) && Objects.equals(nome, employee.nome) && Objects.equals(sobrenome, employee.sobrenome) && Objects.equals(email, employee.email);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, nome, sobrenome, email, feedbackFeitos, feedbackRecebidos);
+        setNome(nome);
+        setSobrenome(sobrenome);
+        setEmail(email);
     }
 
     public Long getId() {
@@ -79,19 +73,24 @@ public class Employee {
         this.email = email;
     }
 
-    public List<Feedback> getFeedbackFeitos() {
-        return feedbackFeitos;
+    public void addFeedbackFeitos(Feedback feedback) {
+        if (feedback != null) {
+            if (feedback == null) {
+                feedbackFeitos = new ArrayList<>();
+            }
+            feedback.setAutor(this);
+            feedbackFeitos.add(feedback);
+        }
     }
 
-    public List<Feedback> getFeedbackRecebidos() {
-        return feedbackRecebidos;
+    public void addFeedbackRecebidos(Feedback feedback) {
+        if (feedback != null) {
+            if (feedback == null) {
+                feedbackRecebidos = new ArrayList<>();
+            }
+            feedback.setProprietario(this);
+            feedbackRecebidos.add(feedback);
+        }
     }
 
-    public void setFeedbackFeitos(List<Feedback> feedbackFeitos) {
-        this.feedbackFeitos = feedbackFeitos;
-    }
-
-    public void setFeedbackRecebidos(List<Feedback> feedbackRecebidos) {
-        this.feedbackRecebidos = feedbackRecebidos;
-    }
 }
