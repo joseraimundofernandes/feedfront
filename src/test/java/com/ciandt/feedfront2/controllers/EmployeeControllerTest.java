@@ -71,7 +71,7 @@ class EmployeeControllerTest {
         employee.setEmail("joao.silveira@email.com");
 
         lenient().when(employeeService.buscar(id)).thenReturn(employee);
-//        when(employeeService.atualizar(employee)).thenReturn(employee);
+        when(employeeService.atualizar(employee)).thenReturn(employee);
 
         Employee employeeAtualizado = assertDoesNotThrow(() -> employeeController.atualizar(employee)).getBody();
 

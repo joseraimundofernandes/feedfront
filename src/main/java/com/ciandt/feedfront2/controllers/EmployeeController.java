@@ -45,12 +45,13 @@ public class EmployeeController {
     @ApiOperation(value = "Este deleta o employee pelo id.")
     @DeleteMapping
     public ResponseEntity apagar(long id) throws BusinessException {
+        employeeService.apagar(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @ApiOperation(value = "Este atualiza o employee.")
     @PutMapping
     public ResponseEntity<Employee> atualizar (Employee employee) throws BusinessException {
-        return new ResponseEntity<>(employeeService.salvar(employee), HttpStatus.OK);
+        return new ResponseEntity<>(employeeService.atualizar(employee), HttpStatus.OK);
     }
 }
