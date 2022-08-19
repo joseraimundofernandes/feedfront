@@ -14,9 +14,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
 public class Feedback {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -30,11 +27,15 @@ public class Feedback {
     private String comoMelhora;
     @Column(nullable = false)
     private LocalDate data;
-
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "autor_id")
     private Employee autor;
-
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "proprietario_id", nullable = false)
     private Employee proprietario;

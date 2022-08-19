@@ -32,7 +32,7 @@ public class EmployeeController {
 
     @ApiOperation(value = "Este busca o employee pelo id.")
     @GetMapping("/{id}")
-    public ResponseEntity<Employee> buscar(long id) throws BusinessException {
+    public ResponseEntity<Employee> buscar(@PathVariable long id) throws BusinessException {
         return new ResponseEntity<>(employeeService.buscar(id), HttpStatus.OK);
     }
 
@@ -43,14 +43,14 @@ public class EmployeeController {
     }
 
     @ApiOperation(value = "Este deleta o employee pelo id.")
-    @DeleteMapping
-    public ResponseEntity apagar(long id) throws BusinessException {
+    @DeleteMapping(value = "/{id}")
+    public ResponseEntity apagar(@PathVariable long id) throws BusinessException {
         employeeService.apagar(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @ApiOperation(value = "Este atualiza o employee.")
-    @PutMapping
+    @PutMapping(value = "/{id}")
     public ResponseEntity<Employee> atualizar (Employee employee) throws BusinessException {
         return new ResponseEntity<>(employeeService.atualizar(employee), HttpStatus.OK);
     }

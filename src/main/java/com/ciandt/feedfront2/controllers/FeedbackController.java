@@ -33,7 +33,7 @@ public class FeedbackController {
 
     @ApiOperation(value = "Este busca o feedback pelo id.")
     @GetMapping("/{id}")
-    public ResponseEntity<Feedback> buscar(long id) throws BusinessException {
+    public ResponseEntity<Feedback> buscar(@PathVariable long id) throws BusinessException {
         return new ResponseEntity<>(feedbackService.buscar(id), HttpStatus.OK);
     }
 

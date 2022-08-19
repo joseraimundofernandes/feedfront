@@ -33,7 +33,9 @@ public class FeedbackServiceImpl implements FeedbackService {
     @Override
     public Feedback buscar(long id) throws BusinessException {
 
-        var result = feedBackRepository.findById(id).
+        Long longId = id;
+
+        var result = feedBackRepository.findById(longId).
                 orElseThrow(() -> new EntidadeNaoEncontradaException("não foi possível encontrar o feedback"));
 
         return result;
@@ -41,7 +43,6 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     @Override
     public Feedback salvar(Feedback feedback) throws BusinessException, IllegalArgumentException {
-
         if (feedback == null) {
             throw new IllegalArgumentException("feedback inválido");
         } else if (feedback.getProprietario() == null) {

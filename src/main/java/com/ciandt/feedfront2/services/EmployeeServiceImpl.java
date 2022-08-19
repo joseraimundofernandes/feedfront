@@ -32,7 +32,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public Employee buscar(long id) throws BusinessException {
 
-        var result = employeeRepository.findById(id).
+        Long longId = id;
+
+        var result = employeeRepository.findById(longId).
                 orElseThrow(() -> new EntidadeNaoEncontradaException("não foi possível encontrar o employee"));
 
         return result;
@@ -90,7 +92,9 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public void apagar(long id) throws BusinessException {
 
-        buscar(id);
+        Long longId = id;
+
+        buscar(longId);
 
         employeeRepository.deleteById(id);
     }

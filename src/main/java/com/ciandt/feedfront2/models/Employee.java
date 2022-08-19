@@ -2,7 +2,6 @@ package com.ciandt.feedfront2.models;
 
 import com.ciandt.feedfront2.exceptions.ComprimentoInvalidoException;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,9 +17,6 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id")
 public class Employee {
 
     @Id
@@ -38,10 +34,14 @@ public class Employee {
     @Column(unique = true, nullable = false)
     @Email(message = "Já existe um cadastro com esse email")
     private String email;
-
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
     @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Feedback> feedbackFeitos;
-
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
     @OneToMany(mappedBy = "proprietario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Feedback> feedbackRecebidos;
 
